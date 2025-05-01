@@ -245,9 +245,6 @@ app.post('/api/user/theme', authenticateToken, async (req, res) => {
   }
 });
 
-// Import events routes
-const eventRoutes = require('./routes/events');
-
 // Register API routes
 app.use('/api/tasks', taskRoutes);
 app.use('/api/notes', noteRoutes);
