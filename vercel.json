@@ -1,24 +1,22 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["prisma/**"] }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
-  ],
-  "build": {
+    "version": 2,
+    "builds": [
+      {
+        "src": "server.js",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": ["prisma/**"]
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/server.js"
+      }
+    ],
     "env": {
       "DATABASE_URL": "postgresql://user_owner:npg_DdVkJzAO8n3W@ep-ancient-waterfall-a4kbx4lz-pooler.us-east-1.aws.neon.tech/user?sslmode=require"
     }
-  },
-  "env": {
-    "DATABASE_URL": "postgresql://user_owner:npg_DdVkJzAO8n3W@ep-ancient-waterfall-a4kbx4lz-pooler.us-east-1.aws.neon.tech/user?sslmode=require"
   }
-}
+  
