@@ -8,7 +8,7 @@
           "includeFiles": [
             "prisma/**",
             "node_modules/.prisma/**",
-            "node_modules/@prisma/**"
+            "node_modules/@prisma/**",
             "routes/**"
           ]
         }
@@ -25,3 +25,4 @@
       "DATABASE_URL": "postgresql://user_owner:npg_DdVkJzAO8n3W@ep-ancient-waterfall-a4kbx4lz-pooler.us-east-1.aws.neon.tech/user?sslmode=require"
     }
   }
+  
