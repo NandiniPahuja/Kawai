@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawaii App - Viewing Instructions</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e1f5fe 100%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: #4a5568;
+        }
+        .card {
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            background-color: white;
+        }
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background-color: #ffb6c1;
+        }
+        .btn-primary:hover {
+            background-color: #ff9eb5;
+        }
+        .btn-secondary {
+            background-color: #a5d8ff;
+        }
+        .btn-secondary:hover {
+            background-color: #8bc4ff;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container mx-auto max-w-4xl">
+        <div class="card p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Kawaii App - Viewing Instructions</h1>
+                <img src="./images/kawaii-pet.svg" alt="Kawaii Pet" class="w-20 h-20">
+            </div>
+            
+            <div class="bg-yellow-50 p-4 rounded-lg mb-6 border-l-4 border-yellow-400">
+                <h2 class="text-xl font-bold text-yellow-800 mb-2">Issue: "Can't see anything"</h2>
+                <p class="text-yellow-700">The application requires a server to run properly because it uses backend functionality for user authentication and data storage.</p>
+            </div>
+            
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Solution Options:</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Option 1: Use the Static Version</h3>
+                        <p class="mb-4">We've created a static version of the dashboard that works without a server:</p>
+                        <a href="./static_dashboard.html" class="inline-block py-2 px-6 btn btn-primary text-white font-medium">Open Static Dashboard</a>
+                        <p class="mt-2 text-sm text-gray-600">This version has limited functionality but lets you see the UI and basic interactions.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Option 2: Start the Server</h3>
+                        <p class="mb-2">To run the full application with all features:</p>
+                        <ol class="list-decimal list-inside space-y-2 mb-4">
+                            <li>Open a terminal/command prompt</li>
+                            <li>Navigate to the project directory: <code class="bg-gray-100 px-2 py-1 rounded">cd path/to/kawai_work</code></li>
+                            <li>Install dependencies: <code class="bg-gray-100 px-2 py-1 rounded">npm install</code></li>
+                            <li>Start the server: <code class="bg-gray-100 px-2 py-1 rounded">npm run dev</code> or <code class="bg-gray-100 px-2 py-1 rounded">node server.js</code></li>
+                            <li>Open <code class="bg-gray-100 px-2 py-1 rounded">http://localhost:3001</code> in your browser</li>
+                        </ol>
+                        <p class="text-sm text-gray-600">Note: This requires Node.js to be installed on your computer.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Option 3: View Individual HTML Files</h3>
+                        <p class="mb-4">You can open the HTML files directly in your browser, but some features won't work:</p>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="./index.html" class="py-2 px-6 btn btn-secondary text-white font-medium">Login Page</a>
+                            <a href="./dashboard.html" class="py-2 px-6 btn btn-secondary text-white font-medium">Dashboard</a>
+                            <a href="./test.html" class="py-2 px-6 btn btn-secondary text-white font-medium">Test Page</a>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">Note: Authentication and data storage features won't work without the server.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h2 class="text-xl font-bold text-blue-800 mb-2">Technical Details</h2>
+                <p class="text-blue-700 mb-2">This application uses:</p>
+                <ul class="list-disc list-inside space-y-1 text-blue-700">
+                    <li>Frontend: HTML, CSS (with Tailwind CSS), JavaScript</li>
+                    <li>Backend: Node.js with Express</li>
+                    <li>Database: PostgreSQL (via Neon.tech)</li>
+                    <li>Authentication: JWT (JSON Web Tokens)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

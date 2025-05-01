@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawaii Productivity (Static Version)</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.12.16/dist/framer-motion.umd.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --color-primary: #ffb6c1;
+            --color-secondary: #a5d8ff;
+            --color-accent: #ffd6e7;
+            --color-background: #f8f9fa;
+            --color-text: #4a5568;
+            --color-success: #9ae6b4;
+            --color-warning: #fbd38d;
+            --color-danger: #feb2b2;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e1f5fe 100%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: var(--color-text);
+        }
+        
+        .dashboard-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ff9eb5;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #8bc4ff;
+            transform: translateY(-2px);
+        }
+        
+        .pet-container {
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pet-container:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Header with Pet Companion -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Kawaii Productivity (Static Version)</h1>
+                <p class="text-gray-600">Make your day cute and productive!</p>
+                <p class="mt-2 text-sm bg-yellow-100 p-2 rounded">This is a static version that works without a server</p>
+            </div>
+            <div class="pet-container" id="petCompanion">
+                <img src="./images/kawaii-pet.svg" alt="Pet Companion" class="w-full h-full object-contain">
+            </div>
+        </header>
+        
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 dashboard-grid">
+            <!-- Today's Routine -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Today's Routine</h2>
+                <ul class="space-y-3" id="routineList">
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Wake up early</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Morning exercise</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Study session</span>
+                    </li>
+                </ul>
+                <button class="mt-4 w-full py-2 px-4 btn-primary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Add New Task</button>
+            </div>
+            
+            <!-- Pomodoro Timer -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Pomodoro Timer</h2>
+                <div class="text-center text-4xl font-bold mb-4" id="pomodoroTimer">25:00</div>
+                <div class="flex space-x-2 mb-4">
+                    <button id="startPomodoroBtn" class="flex-1 py-2 px-4 btn-primary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Start</button>
+                    <button id="resetPomodoroBtn" class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-300 focus:outline-none">Reset</button>
+                </div>
+            </div>
+            
+            <!-- Mood Tracker -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Today's Mood</h2>
+                <p class="mb-3 text-gray-600">How are you feeling today?</p>
+                <div class="flex justify-around mb-4" id="moodSelector">
+                    <div class="mood-emoji p-2 text-3xl cursor-pointer hover:scale-125 transition-transform" data-mood="happy">😊</div>
+                    <div class="mood-emoji p-2 text-3xl cursor-pointer hover:scale-125 transition-transform" data-mood="neutral">😐</div>
+                    <div class="mood-emoji p-2 text-3xl cursor-pointer hover:scale-125 transition-transform" data-mood="tired">😴</div>
+                    <div class="mood-emoji p-2 text-3xl cursor-pointer hover:scale-125 transition-transform" data-mood="stressed">😰</div>
+                    <div class="mood-emoji p-2 text-3xl cursor-pointer hover:scale-125 transition-transform" data-mood="excited">🤩</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple JavaScript for basic functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pet Companion Animation
+            const petCompanion = document.getElementById('petCompanion');
+            
+            petCompanion.addEventListener('click', () => {
+                animatePet();
+            });
+            
+            function animatePet() {
+                const animation = {
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0],
+                    transition: { duration: 0.6 }
+                };
+                
+                try {
+                    const { animate: motionAnimate } = window.Motion;
+                    motionAnimate(petCompanion, animation);
+                } catch (error) {
+                    console.error('Animation error:', error);
+                    // Fallback animation if Framer Motion fails
+                    petCompanion.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        petCompanion.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            }
+            
+            // Mood selector
+            const moodEmojis = document.querySelectorAll('.mood-emoji');
+            moodEmojis.forEach(emoji => {
+                emoji.addEventListener('click', () => {
+                    moodEmojis.forEach(e => e.classList.remove('bg-pink-100'));
+                    emoji.classList.add('bg-pink-100');
+                    alert(`You selected: ${emoji.dataset.mood} mood!`);
+                });
+            });
+            
+            // Simple Pomodoro Timer
+            const pomodoroTimer = document.getElementById('pomodoroTimer');
+            const startBtn = document.getElementById('startPomodoroBtn');
+            const resetBtn = document.getElementById('resetPomodoroBtn');
+            
+            let timerInterval;
+            let minutes = 25;
+            let seconds = 0;
+            let isRunning = false;
+            
+            startBtn.addEventListener('click', () => {
+                if (!isRunning) {
+                    isRunning = true;
+                    startBtn.textContent = 'Pause';
+                    timerInterval = setInterval(updateTimer, 1000);
+                } else {
+                    isRunning = false;
+                    startBtn.textContent = 'Resume';
+                    clearInterval(timerInterval);
+                }
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                clearInterval(timerInterval);
+                minutes = 25;
+                seconds = 0;
+                updateTimerDisplay();
+                isRunning = false;
+                startBtn.textContent = 'Start';
+            });
+            
+            function updateTimer() {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        clearInterval(timerInterval);
+                        alert('Time is up! Take a break!');
+                        isRunning = false;
+                        startBtn.textContent = 'Start';
+                        minutes = 25;
+                        seconds = 0;
+                        updateTimerDisplay();
+                        return;
+                    }
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                updateTimerDisplay();
+            }
+            
+            function updateTimerDisplay() {
+                pomodoroTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Task checkboxes
+            const checkboxes = document.querySelectorAll('.routine-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const taskText = checkbox.nextElementSibling;
+                    if (checkbox.checked) {
+                        taskText.style.textDecoration = 'line-through';
+                        taskText.style.opacity = '0.7';
+                    } else {
+                        taskText.style.textDecoration = 'none';
+                        taskText.style.opacity = '1';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

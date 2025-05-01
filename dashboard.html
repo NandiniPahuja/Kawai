@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawaii Productivity</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.12.16/dist/framer-motion.umd.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --color-primary: #ff85a2;
+            --color-primary-light: #ffa5c4;
+            --color-secondary: #ffb7e0;
+            --color-accent: #ffc2d1;
+            --color-background: #fff0f5;
+            --color-text: #8a5a6c;
+            --color-success: #b5e6d8;
+            --color-warning: #ffe0b5;
+            --color-danger: #ffb5c2;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffe6f2 0%, #ffd6e7 50%, #ffcce6 100%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: var(--color-text);
+        }
+        
+        .dashboard-card {
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.2);
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ffd6e7;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 133, 162, 0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 133, 162, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(255, 183, 224, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #ffc2e6;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 183, 224, 0.4);
+        }
+        
+        .pet-container {
+            width: 140px;
+            height: 140px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .pet-container:hover {
+            transform: scale(1.1);
+        }
+        
+        .task-item {
+            border-radius: 18px;
+            transition: all 0.3s ease;
+            border: 2px solid #ffd6e7;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 133, 162, 0.15);
+        }
+        
+        .task-complete {
+            text-decoration: line-through;
+            opacity: 0.7;
+            background-color: rgba(255, 240, 245, 0.8);
+        }
+        
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .mood-emoji {
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mood-emoji:hover {
+            transform: scale(1.2);
+        }
+        
+        input[type="checkbox"] {
+            accent-color: var(--color-primary);
+            width: 16px;
+            height: 16px;
+        }
+        
+        .bg-gray-100 {
+            background-color: #fff0f5;
+        }
+        
+        .rounded-full {
+            box-shadow: 0 2px 8px rgba(255, 133, 162, 0.15);
+        }
+            transition: all 0.3s ease;
+        }
+        
+        .mood-emoji:hover {
+            transform: scale(1.2);
+        }
+        
+        .mood-selected {
+            transform: scale(1.2);
+            background-color: var(--color-accent);
+            border-radius: 50%;
+            padding: 5px;
+        }
+        
+        .sticky-note {
+            min-height: 150px;
+            border-radius: 12px;
+            background-color: #fff9c4;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+        }
+        
+        .sticky-note:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+        
+        .streak-badge {
+            background-color: var(--color-accent);
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            animation: bounce 0.5s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pomodoro-timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .break-animation {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .weekly-task-item {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .weekly-task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reminder-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            max-width: 350px;
+            animation: slideIn 0.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .reminder-popup img {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pet-container {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <!-- Kawaii decorative elements -->
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+        <img src="./images/kawaii-star.svg" class="absolute top-10 left-10 w-16 h-16 opacity-70 animate-float" style="animation-delay: 0s;">
+        <img src="./images/kawaii-star.svg" class="absolute top-20 right-20 w-12 h-12 opacity-60 animate-float" style="animation-delay: 0.5s;">
+        <img src="./images/kawaii-star.svg" class="absolute bottom-10 left-1/4 w-14 h-14 opacity-50 animate-float" style="animation-delay: 1s;">
+        <img src="./images/kawaii-star.svg" class="absolute bottom-20 right-1/3 w-10 h-10 opacity-40 animate-float" style="animation-delay: 1.5s;">
+        <img src="./images/kawaii-star.svg" class="absolute top-1/3 right-10 w-16 h-16 opacity-60 animate-float" style="animation-delay: 2s;">
+    </div>
+    <div class="container mx-auto max-w-6xl">
+        <!-- Header with Pet Companion -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Kawaii Productivity</h1>
+                <p class="text-gray-600">Make your day cute and productive!</p>
+            </div>
+            <div class="pet-container" id="petCompanion">
+                <img src="./images/kawaii-pet.svg" alt="Pet Companion" class="w-full h-full object-contain">
+            </div>
+        </header>
+        
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 dashboard-grid">
+            <!-- Today's Routine -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Today's Routine</h2>
+                <ul class="space-y-3" id="routineList">
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Wake up early</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Morning exercise</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Study session</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Healthy lunch</span>
+                    </li>
+                    <li class="flex items-center p-3 bg-gray-50 task-item">
+                        <input type="checkbox" class="routine-checkbox h-5 w-5 text-pink-300 rounded-md mr-3">
+                        <span>Evening walk</span>
+                    </li>
+                </ul>
+                <button class="mt-4 w-full py-2 px-4 btn-primary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Add New Task</button>
+            </div>
+            
+            <!-- Weekly Tasks -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Weekly Tasks</h2>
+                <div class="space-y-3" id="weeklyTasksList">
+                    <div class="p-3 bg-blue-50 weekly-task-item" data-task="laundry">
+                        <h3 class="font-semibold">Laundry Day</h3>
+                        <p class="text-sm text-gray-600">Every Monday</p>
+                    </div>
+                    <div class="p-3 bg-purple-50 weekly-task-item" data-task="haircare">
+                        <h3 class="font-semibold">Hair Care</h3>
+                        <p class="text-sm text-gray-600">Every Wednesday</p>
+                    </div>
+                    <div class="p-3 bg-green-50 weekly-task-item" data-task="cleaning">
+                        <h3 class="font-semibold">Room Cleaning</h3>
+                        <p class="text-sm text-gray-600">Every Saturday</p>
+                    </div>
+                    <div class="p-3 bg-yellow-50 weekly-task-item" data-task="groceries">
+                        <h3 class="font-semibold">Grocery Shopping</h3>
+                        <p class="text-sm text-gray-600">Every Sunday</p>
+                    </div>
+                </div>
+                <button class="mt-4 w-full py-2 px-4 btn-secondary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Add Weekly Task</button>
+            </div>
+            
+            <!-- Pomodoro Timer -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Pomodoro Timer</h2>
+                <div class="pomodoro-timer mb-4" id="pomodoroTimer">25:00</div>
+                <div class="flex space-x-2 mb-4">
+                    <button id="startPomodoroBtn" class="flex-1 py-2 px-4 btn-primary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Start</button>
+                    <button id="resetPomodoroBtn" class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-300 focus:outline-none">Reset</button>
+                </div>
+                <div class="break-animation hidden" id="breakAnimation">
+                    <div class="text-center">
+                        <img src="./images/kawaii-pet.svg" alt="Break Time" class="w-24 h-24 mx-auto mb-2">
+                        <p class="text-xl font-bold">Take a Break! 🐱☕</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mood Tracker -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Today's Mood</h2>
+                <p class="mb-3 text-gray-600">How are you feeling today?</p>
+                <div class="flex justify-around mb-4" id="moodSelector">
+                    <div class="mood-emoji p-2" data-mood="happy">😊</div>
+                    <div class="mood-emoji p-2" data-mood="neutral">😐</div>
+                    <div class="mood-emoji p-2" data-mood="tired">😴</div>
+                    <div class="mood-emoji p-2" data-mood="stressed">😰</div>
+                    <div class="mood-emoji p-2" data-mood="excited">🤩</div>
+                </div>
+                <div class="mt-4 text-center hidden" id="moodMessage">
+                    <p class="text-lg font-medium">You're feeling <span id="selectedMood">happy</span> today!</p>
+                </div>
+            </div>
+            
+            <!-- Notes Section -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Quick Notes</h2>
+                <div class="sticky-note p-4 mb-4">
+                    <textarea class="w-full h-full bg-transparent border-none focus:outline-none resize-none" placeholder="Write your thoughts here..."></textarea>
+                </div>
+                <div class="flex justify-between">
+                    <button class="py-2 px-4 bg-yellow-100 text-yellow-700 font-medium rounded-lg shadow-sm hover:bg-yellow-200 focus:outline-none">New Note</button>
+                    <div class="flex space-x-2">
+                        <button class="p-2 bg-pink-100 text-pink-700 rounded-full">🌸</button>
+                        <button class="p-2 bg-blue-100 text-blue-700 rounded-full">⭐</button>
+                        <button class="p-2 bg-green-100 text-green-700 rounded-full">🍀</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Habit Streaks -->
+            <div class="dashboard-card p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Habit Streaks</h2>
+                <ul class="space-y-4">
+                    <li class="flex justify-between items-center">
+                        <span>Morning Meditation</span>
+                        <span class="streak-badge">5 Days in a Row! 🎉</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span>Drinking Water</span>
+                        <span class="streak-badge">12 Days in a Row! 🌊</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span>Reading</span>
+                        <span class="streak-badge">3 Days in a Row! 📚</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span>Journaling</span>
+                        <span class="streak-badge">7 Days in a Row! ✏️</span>
+                    </li>
+                </ul>
+                <button class="mt-4 w-full py-2 px-4 btn-primary text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none">Track New Habit</button>
+            </div>
+        </div>
+        
+        <!-- Reminder Popup (Hidden by default) -->
+        <div class="reminder-popup hidden" id="reminderPopup">
+            <img src="./images/kawaii-pet.svg" alt="Reminder Pet">
+            <div>
+                <h3 class="font-bold text-gray-800 mb-1" id="reminderTitle">Reminder Title</h3>
+                <p class="text-gray-600" id="reminderMessage">Reminder message goes here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Dashboard Functionality -->
+    <!-- Dashboard JavaScript -->
+    <script src="./js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pet Companion Animation
+            const petCompanion = document.getElementById('petCompanion');
+            let petHappiness = 100; // 0-100 scale
+            
+            petCompanion.addEventListener('click', () => {
+                animatePet();
+            });
+            
+            function animatePet() {
+                const animation = {
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0],
+                    transition: { duration: 0.6 }
+                };
+                
+                const { animate: motionAnimate } = window.Motion;
+                motionAnimate(petCompanion, animation);
+            }
+            
+            // Update pet based on task completion
+            function updatePetHappiness() {
+                const completedTasks = document.querySelectorAll('.routine-checkbox:checked').length;
+                const totalTasks = document.querySelectorAll('.routine-checkbox').length;
+                
+                petHappiness = Math.min(100, Math.max(50, (completedTasks / totalTasks) * 100));
+                
+                // Update pet appearance based on happiness
+                if (petHappiness < 60) {
+                    petCompanion.style.opacity = '0.7';
+                    petCompanion.style.transform = 'rotate(-5deg)';
+                } else {
+                    petCompanion.style.opacity = '1';
+                    petCompanion.style.transform = 'rotate(0deg)';
+                }
+            }
+            
+            // Today's Routine Checkboxes
+            const routineCheckboxes = document.querySelectorAll('.routine-checkbox');
+            
+            routineCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const taskItem = this.parentElement;
+                    
+                    if (this.checked) {
+                        taskItem.querySelector('span').classList.add('task-complete');
+                        createSparkle(taskItem);
+                        updatePetHappiness();
+                    } else {
+                        taskItem.querySelector('span').classList.remove('task-complete');
+                        updatePetHappiness();
+                    }
+                });
+            });
+            
+            // Create sparkle animation when task is completed
+            function createSparkle(element) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                sparkle.innerHTML = '✨';
+                sparkle.style.fontSize = '1.5rem';
+                
+                // Position the sparkle near the checkbox
+                const rect = element.getBoundingClientRect();
+                sparkle.style.left = `${rect.left + 10}px`;
+                sparkle.style.top = `${rect.top + 10}px`;
+                
+                document.body.appendChild(sparkle);
+                
+                // Animate the sparkle
+                const animation = {
+                    opacity: [1, 0],
+                    y: [-10, -30],
+                    scale: [1, 1.5, 0],
+                    transition: { duration: 1 }
+                };
+                
+                const { animate: motionAnimate } = window.Motion;
+                motionAnimate(sparkle, animation, {
+                    onComplete: () => {
+                        sparkle.remove();
+                    }
+                });
+            }
+            
+            // Weekly Tasks with Reminders
+            const weeklyTasks = document.querySelectorAll('.weekly-task-item');
+            const reminderPopup = document.getElementById('reminderPopup');
+            const reminderTitle = document.getElementById('reminderTitle');
+            const reminderMessage = document.getElementById('reminderMessage');
+            
+            weeklyTasks.forEach(task => {
+                task.addEventListener('click', function() {
+                    const taskType = this.dataset.task;
+                    showReminder(taskType);
+                });
+            });
+            
+            function showReminder(taskType) {
+                let title, message;
+                
+                switch(taskType) {
+                    case 'laundry':
+                        title = 'Laundry Day';
+                        message = 'Have you washed your clothes? 🧺✨';
+                        break;
+                    case 'haircare':
+                        title = 'Hair Care Day';
+                        message = 'Time for hair spa! 🧴🐾';
+                        break;
+                    case 'cleaning':
+                        title = 'Room Cleaning';
+                        message = 'Let\'s make your space sparkle! 🧹✨';
+                        break;
+                    case 'groceries':
+                        title = 'Grocery Shopping';
+                        message = 'Time to stock up on snacks! 🛒🍎';
+                        break;
+                    default:
+                        title = 'Weekly Task';
+                        message = 'Don\'t forget your task!';
+                }
+                
+                reminderTitle.textContent = title;
+                reminderMessage.textContent = message;
+                reminderPopup.classList.remove('hidden');
+                
+                // Hide the reminder after 5 seconds
+                setTimeout(() => {
+                    reminderPopup.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Pomodoro Timer
+            const pomodoroTimer = document.getElementById('pomodoroTimer');
+            const startPomodoroBtn = document.getElementById('startPomodoroBtn');
+            const resetPomodoroBtn = document.getElementById('resetPomodoroBtn');
+            const breakAnimation = document.getElementById('breakAnimation');
+            
+            let timerInterval;
+            let minutes = 25;
+            let seconds = 0;
+            let isRunning = false;
+            let isBreak = false;
+            
+            startPomodoroBtn.addEventListener('click', function() {
+                if (isRunning) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    this.textContent = 'Resume';
+                } else {
+                    startTimer();
+                    isRunning = true;
+                    this.textContent = 'Pause';
+                }
+            });
+            
+            resetPomodoroBtn.addEventListener('click', function() {
+                clearInterval(timerInterval);
+                isRunning = false;
+                isBreak = false;
+                minutes = 25;
+                seconds = 0;
+                updateTimerDisplay();
+                startPomodoroBtn.textContent = 'Start';
+                breakAnimation.classList.add('hidden');
+            });
+            
+            function startTimer() {
+                timerInterval = setInterval(() => {
+                    if (seconds === 0) {
+                        if (minutes === 0) {
+                            // Timer completed
+                            clearInterval(timerInterval);
+                            isRunning = false;
+                            
+                            if (!isBreak) {
+                                // Switch to break time
+                                isBreak = true;
+                                minutes = 5;
+                                seconds = 0;
+                                updateTimerDisplay();
+                                showBreakAnimation();
+                                startTimer();
+                            } else {
+                                // Break completed, reset to work time
+                                isBreak = false;
+                                minutes = 25;
+                                seconds = 0;
+                                updateTimerDisplay();
+                                hideBreakAnimation();
+                                startPomodoroBtn.textContent = 'Start';
+                            }
+                            return;
+                        }
+                        minutes--;
+                        seconds = 59;
+                    } else {
+                        seconds--;
+                    }
+                    updateTimerDisplay();
+                }, 1000);
+            }
+            
+            function updateTimerDisplay() {
+                pomodoroTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            function showBreakAnimation() {
+                breakAnimation.classList.remove('hidden');
+                animatePet(); // Make the pet happy during break
+            }
+            
+            function hideBreakAnimation() {
+                breakAnimation.classList.add('hidden');
+            }
+            
+            // Mood Tracker
+            const moodEmojis = document.querySelectorAll('.mood-emoji');
+            const moodMessage = document.getElementById('moodMessage');
+            const selectedMoodText = document.getElementById('selectedMood');
+            
+            moodEmojis.forEach(emoji => {
+                emoji.addEventListener('click', function() {
+                    // Remove selected class from all emojis
+                    moodEmojis.forEach(e => e.classList.remove('mood-selected'));
+                    
+                    // Add selected class to clicked emoji
+                    this.classList.add('mood-selected');
+                    
+                    // Show mood message
+                    const mood = this.dataset.mood;
+                    selectedMoodText.textContent = mood;
+                    moodMessage.classList.remove('hidden');
+                    
+                    // Animate pet based on mood
+                    animatePet();
+                });
+            });
+            
+            // Initialize the dashboard
+            updateTimerDisplay();
+        });
+    </script>
+</body>
+</html>

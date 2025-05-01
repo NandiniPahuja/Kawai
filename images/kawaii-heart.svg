@@ -1,0 +1,11 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Heart shape -->
+  <path d="M50 90 C100 65 100 20 75 10 C60 5 50 15 50 25 C50 15 40 5 25 10 C0 20 0 65 50 90 Z" fill="#ffc2d1" stroke="#ff85a2" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Kawaii face -->
+  <circle cx="38" cy="40" r="3" fill="#8a5a6c"/>
+  <circle cx="62" cy="40" r="3" fill="#8a5a6c"/>
+  <path d="M43 50 Q50 55 57 50" stroke="#8a5a6c" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Blush -->
+  <circle cx="32" cy="45" r="4" fill="#ff85a2" opacity="0.5"/>
+  <circle cx="68" cy="45" r="4" fill="#ff85a2" opacity="0.5"/>
+</svg>
