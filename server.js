@@ -1,3 +1,7 @@
+// Load environment variables FIRST
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: __dirname + '/.env' });
+}
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,6 +12,14 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 
 // Import routes
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'running',
+    message: 'Kawai API is operational',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 const taskRoutes = require('./routes/tasks');
 const noteRoutes = require('./routes/notes');
 const eventRoutes = require('./routes/events');
