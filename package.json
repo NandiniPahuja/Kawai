@@ -4,6 +4,7 @@
   "description": "Kawaii themed productivity application with task management, notes, and calendar",
   "main": "server.js",
   "scripts": {
+    "build": "prisma generate && prisma migrate deploy && node server.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prisma:generate": "prisma generate",
