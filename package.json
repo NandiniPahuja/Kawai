@@ -12,7 +12,7 @@
     "prisma:studio": "prisma studio",
     "vercel-build": "npm install -g prisma && prisma generate && prisma migrate deploy",
     "postinstall": "npm install -g prisma && prisma generate",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
