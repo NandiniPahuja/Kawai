@@ -10,8 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-
-    "postinstall": "prisma generate",
+    "vercel-build": "npm install -g prisma && prisma generate && prisma migrate deploy",
+    "postinstall": "npm install -g prisma && prisma generate",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "prisma": {
