@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const prisma = require('./lib/prisma'); // Assuming you created this
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // Check required env vars
 if (!process.env.JWT_SECRET || !process.env.DATABASE_URL) {
@@ -27,10 +28,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Test DB connection
 (async () => {
   try {
-    await prisma.$connect();
-    console.log('✅ Database connected');
+    // No need to explicitly connect, Prisma does this lazily
+    // await prisma.$connect(); 
+    console.log('Prisma client initialized. Connection will be established on first query.');
   } catch (err) {
-    console.error('❌ Database connection error:', err);
+    console.error('❌ Error during initial Prisma setup (though connection is lazy):', err);
   }
 })();
 
