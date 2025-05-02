@@ -11,7 +11,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "vercel-build": "npm install -g prisma && prisma generate && prisma migrate deploy",
-    "postinstall": "npm install -g prisma && prisma generate"
+    "postinstall": "npm install -g prisma && prisma generate",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
