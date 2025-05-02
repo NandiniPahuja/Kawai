@@ -1,29 +1,17 @@
-// Load environment variables FIRST
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: __dirname + '/.env' });
-}
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const path = require('path');
+const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
+const prisma = require('./lib/prisma'); // Assuming you created this
 
-// Import routes
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.json({
-    status: 'running',
-    message: 'Kawai API is operational',
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-const taskRoutes = require('./routes/tasks');
-const noteRoutes = require('./routes/notes');
-const eventRoutes = require('./routes/events');
-const moodRoutes = require('./routes/moods');
+// Check required env vars
+if (!process.env.JWT_SECRET || !process.env.DATABASE_URL) {
+  throw new Error("Missing required environment variables (JWT_SECRET or DATABASE_URL).");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -33,257 +21,172 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Initialize Prisma client
-const prisma = new PrismaClient();
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Test database connection
-async function testDbConnection() {
+// Test DB connection
+(async () => {
   try {
     await prisma.$connect();
-    console.log('Database connected successfully');
-  } catch (error) {
-    console.error('Database connection error:', error);
-    console.log('Please check your DATABASE_URL in .env file and ensure your database is running.');
-    console.log('If using Neon Tech, verify that your database is active and credentials are correct.');
+    console.log('✅ Database connected');
+  } catch (err) {
+    console.error('❌ Database connection error:', err);
   }
-}
-
-testDbConnection();
-
-// JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || 'kawaii-secret-key';
+})();
 
 // Routes
-// Rate limiter for signup endpoint
-const signupLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: { error: 'Too many signup attempts from this IP, please try again after 15 minutes.' }
-});
-// Register new user
-app.post('/api/register', signupLimiter, async (req, res) => {
-  try {
-    const { fullName, email, password } = req.body;
-    
-    // Validate input
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-    
-    // Check if user already exists
-    const userExists = await prisma.user.findUnique({
-      where: { email }
-    });
-    
-    if (userExists) {
-      return res.status(400).json({ error: 'User with this email already exists' });
-    }
-    
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    // Create new user
-    const newUser = await prisma.user.create({
-      data: {
-        fullName,
-        email,
-        password: hashedPassword,
-        theme: 'pastel'
-      }
-    });
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: newUser.id, email: newUser.email },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-    
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: newUser.id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        theme: newUser.theme
-      },
-      token
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Server error during registration' });
-  }
+app.get('/', (req, res) => {
+  res.json({
+    status: 'running',
+    message: 'Kawai API is operational',
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
-// Login user
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-    
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-    
-    // Verify password
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-    
-    res.status(200).json({
-      message: 'Login successful',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        theme: user.theme,
-        moodToday: user.moodToday
-      },
-      token
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error during login' });
-  }
-});
-
-// Protected route example
-app.get('/api/user', authenticateToken, async (req, res) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id }
-    });
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.status(200).json({
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        theme: user.theme,
-        moodToday: user.moodToday
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Middleware to authenticate JWT token
+// Auth middleware
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
-  }
-  
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access denied. No token.' });
+
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
+    if (err) return res.status(403).json({ error: 'Invalid or expired token' });
     req.user = user;
     next();
   });
 }
 
-// User mood update
+// Rate limiter
+const signupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many signup attempts. Try again in 15 minutes.' }
+});
+
+// Register
+app.post('/api/register', signupLimiter, async (req, res) => {
+  try {
+    const { fullName, email, password } = req.body;
+    if (!fullName || !email || !password)
+      return res.status(400).json({ error: 'All fields required' });
+
+    const exists = await prisma.user.findUnique({ where: { email } });
+    if (exists) return res.status(400).json({ error: 'User already exists' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { fullName, email, password: hashed, theme: 'pastel' }
+    });
+
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(201).json({
+      message: 'User registered',
+      user: { id: user.id, fullName: user.fullName, email: user.email, theme: user.theme },
+      token
+    });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email and password required' });
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password)))
+      return res.status(400).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({
+      message: 'Login successful',
+      user: { id: user.id, fullName: user.fullName, email: user.email, theme: user.theme, moodToday: user.moodToday },
+      token
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Protected user route
+app.get('/api/user', authenticateToken, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({ user });
+  } catch (err) {
+    console.error('Fetch user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mood update
 app.post('/api/user/mood', authenticateToken, async (req, res) => {
   try {
     const { mood } = req.body;
-    
-    if (!mood) {
-      return res.status(400).json({ error: 'Mood is required' });
-    }
-    
-    const updatedUser = await prisma.user.update({
+    if (!mood) return res.status(400).json({ error: 'Mood is required' });
+
+    const updated = await prisma.user.update({
       where: { id: req.user.id },
       data: { moodToday: mood }
     });
-    
-    res.json({
-      message: 'Mood updated successfully',
-      mood: updatedUser.moodToday
-    });
-  } catch (error) {
-    console.error('Mood update error:', error);
+
+    res.json({ message: 'Mood updated', mood: updated.moodToday });
+  } catch (err) {
+    console.error('Mood update error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// User theme update
+// Theme update
 app.post('/api/user/theme', authenticateToken, async (req, res) => {
   try {
     const { theme } = req.body;
-    
-    if (!theme) {
-      return res.status(400).json({ error: 'Theme is required' });
-    }
-    
-    const updatedUser = await prisma.user.update({
+    if (!theme) return res.status(400).json({ error: 'Theme is required' });
+
+    const updated = await prisma.user.update({
       where: { id: req.user.id },
       data: { theme }
     });
-    
-    res.json({
-      message: 'Theme updated successfully',
-      theme: updatedUser.theme
-    });
-  } catch (error) {
-    console.error('Theme update error:', error);
+
+    res.json({ message: 'Theme updated', theme: updated.theme });
+  } catch (err) {
+    console.error('Theme update error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Register API routes
-app.use('/api/tasks', taskRoutes);
-app.use('/api/notes', noteRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/moods', moodRoutes);
+// Mount other route modules
+app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/notes', require('./routes/notes'));
+app.use('/api/events', require('./routes/events'));
+app.use('/api/moods', require('./routes/moods'));
 
-// Error handling for uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  console.log('The server will continue running, but please fix the error.');
+// Global error handling
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception:', err);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  console.log('The server will continue running, but please fix the error.');
+process.on('unhandledRejection', (reason, p) => {
+  console.error('Unhandled Rejection at:', p, 'reason:', reason);
 });
 
-// Start server with error handling
+// Start server
 const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT} in your browser`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
-server.on('error', (error) => {
-  if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Please use a different port.`);
+server.on('error', err => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} in use. Use a different one.`);
   } else {
-    console.error('Server error:', error);
+    console.error('Server error:', err);
   }
 });
